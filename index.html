@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Data Science MCQ Chatbot</title>
+    <style>
+        body {
+            background-color: #f0f8ff;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+        .question {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        .options label {
+            display: block;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+        .btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+        }
+        #summary {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="userInput">
+            <h2>Welcome to Data Science MCQ Quiz</h2>
+            <p>Please enter your name and class:</p>
+            <input type="text" id="studentName" placeholder="Your Name">
+            <input type="text" id="studentClass" placeholder="Your Class">
+            <br><br>
+            <button class="btn" onclick="startQuiz()">Start Quiz</button>
+        </div>
+
+        <div id="quizBox" style="display:none;">
+            <div class="question" id="questionText"></div>
+            <div class="options" id="optionList"></div>
+            <button class="btn" onclick="nextQuestion()">Next</button>
+        </div>
+
+        <div id="summary">
+            <h2>Quiz Completed!</h2>
+            <p id="summaryText"></p>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                q: "What is the primary benefit of Data Science?",
+                options: ["Predicting outcomes", "Data deletion", "Manual entry", "Erasing records"],
+                answer: 0
+            },
+            {
+                q: "Which is a key use of Data Science?",
+                options: ["Cooking recipes", "Forecasting trends", "Drawing art", "Running marathons"],
+                answer: 1
+            },
+            {
+                q: "Facets of data include all except:",
+                options: ["Volume", "Velocity", "Violin", "Variety"],
+                answer: 2
+            },
+            {
+                q: "What is the first step in the Data Science process?",
+                options: ["Build model", "Present findings", "Define research goals", "EDA"],
+                answer: 2
+            },
+            {
+                q: "What does EDA stand for?",
+                options: ["Extra Data Analysis", "Exploratory Data Analysis", "External Data Algorithm", "Express Data Access"],
+                answer: 1
+            },
+            {
+                q: "Which of these is not part of Data Science Process?",
+                options: ["Retrieving data", "Data mining", "Painting", "Build the model"],
+                answer: 2
+            },
+            {
+                q: "Data preparation involves:",
+                options: ["Deleting useful data", "Cleansing and formatting", "Hiding files", "Running apps"],
+                answer: 1
+            },
+            {
+                q: "Presenting findings is which stage?",
+                options: ["Initial", "Final", "Middle", "None"],
+                answer: 1
+            },
+            {
+                q: "What is Data Mining?",
+                options: ["Extracting useful patterns", "Making caves", "Data destruction", "Ignoring data"],
+                answer: 0
+            },
+            {
+                q: "What is Data Warehousing used for?",
+                options: ["Storing data for analysis", "Washing clothes", "Cooking", "Surfing the internet"],
+                answer: 0
+            },
+            {
+                q: "Mean, Median, and Mode are:",
+                options: ["Shapes", "Statistical measures", "Paintings", "Files"],
+                answer: 1
+            },
+            {
+                q: "Which one is a central tendency measure?",
+                options: ["Histogram", "Pie chart", "Median", "Bar graph"],
+                answer: 2
+            },
+            {
+                q: "Standard deviation shows:",
+                options: ["Data speed", "Data shape", "Data variation", "Data size"],
+                answer: 2
+            },
+            {
+                q: "EDA helps in:",
+                options: ["Understanding data structure", "Destroying data", "Encrypting data", "Sharing passwords"],
+                answer: 0
+            },
+            {
+                q: "Data retrieval comes after:",
+                options: ["Building model", "Defining goal", "Summarization", "Story writing"],
+                answer: 1
+            },
+            {
+                q: "Which is used in data preparation?",
+                options: ["Error handling", "Data cleaning", "Audio mixing", "Painting"],
+                answer: 1
+            },
+            {
+                q: "What is a warehouse in data context?",
+                options: ["A store room", "A place to store data", "A building", "A vehicle"],
+                answer: 1
+            },
+            {
+                q: "Mode refers to:",
+                options: ["Most frequent value", "Fastest data", "File name", "Music mode"],
+                answer: 0
+            },
+            {
+                q: "Which is an application of data science?",
+                options: ["Weather forecasting", "Sewing", "Climbing", "Brushing"],
+                answer: 0
+            },
+            {
+                q: "What does Data Mining involve?",
+                options: ["Data removal", "Data hiding", "Data pattern recognition", "Password guessing"],
+                answer: 2
+            },
+            {
+                q: "What is the use of summary statistics?",
+                options: ["To clean data", "To visualize data", "To describe data", "To ignore data"],
+                answer: 2
+            },
+            {
+                q: "EDA is done before:",
+                options: ["Building model", "Defining goal", "Collecting data", "Storing"],
+                answer: 0
+            },
+            {
+                q: "Which is not a part of statistical description?",
+                options: ["Median", "Mean", "Mode", "Menu"],
+                answer: 3
+            },
+            {
+                q: "The result of model building is:",
+                options: ["Prediction or Insight", "Report", "Music", "Graph only"],
+                answer: 0
+            },
+            {
+                q: "Final step in DS process is:",
+                options: ["Data mining", "Build model", "Present findings", "Sort data"],
+                answer: 2
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let student = { name: '', class: '' };
+
+        function startQuiz() {
+            student.name = document.getElementById('studentName').value;
+            student.class = document.getElementById('studentClass').value;
+
+            if (student.name.trim() === '' || student.class.trim() === '') {
+                alert("Please enter both name and class.");
+                return;
+            }
+
+            document.getElementById('userInput').style.display = 'none';
+            document.getElementById('quizBox').style.display = 'block';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('questionText').textContent = `Q${currentQuestion + 1}: ${q.q}`;
+
+            const optionList = document.getElementById('optionList');
+            optionList.innerHTML = '';
+            q.options.forEach((opt, index) => {
+                optionList.innerHTML += `
+                    <label><input type="radio" name="option" value="${index}"> ${opt}</label>
+                `;
+            });
+        }
+
+        function nextQuestion() {
+            const selectedOption = document.querySelector('input[name="option"]:checked');
+            if (!selectedOption) {
+                alert("Please select an answer.");
+                return;
+            }
+
+            if (parseInt(selectedOption.value) === questions[currentQuestion].answer) {
+                score++;
+            }
+
+            currentQuestion++;
+
+            if (currentQuestion < questions.length) {
+                showQuestion();
+            } else {
+                document.getElementById('quizBox').style.display = 'none';
+                document.getElementById('summary').style.display = 'block';
+                document.getElementById('summaryText').textContent = `Well done, ${student.name} of ${student.class}! You scored ${score} out of ${questions.length}.`;
+            }
+        }
+    </script>
+</body>
+</html>
